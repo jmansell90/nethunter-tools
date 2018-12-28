@@ -1,0 +1,11 @@
+#!/bin/bash
+while :
+do
+	echo "Autocracking Wifi..."
+	outpt=$(/root/scripts/autocrack_wifi | tee /dev/tty)
+	if [[ $outpt = *"No wlan1 device found."* ]]; then
+		sleep 1m
+	else
+		sleep 5
+	fi	
+done

