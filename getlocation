@@ -1,15 +1,21 @@
-#!/bin/bash
-exec 2>/dev/null
-# get positions
-gpstmp=/tmp/gps.data
-gpspipe -w -n 40 >$gpstmp"1"&
-ppid=$!
-sleep 10
-kill -9 $ppid
-cat $gpstmp"1"|grep -om1 "[-]\?[[:digit:]]\{1,3\}\.[[:digit:]]\{9\}" >$gpstmp
-size=$(stat -c%s $gpstmp)
-if [ $size -gt 10 ]; then
-   cat $gpstmp|sed -n -e 1p >/tmp/gps.lat
-   cat $gpstmp|sed -n -e 2p >/tmp/gps.lon
-fi
-rm $gpstmp $gpstmp"1"  
+#!/usr/bin/python
+from time import sleep
+import gps3
+
+the_connection = gps3.GPSDSocket()
+the_fix = gps3.DataStream()
+
+try:
+    for new_data in the_connection:
+        if new_data:
+            the_fix.refresh(new_data)
+        if not isinstance(the_fix.TPV['lat'], str):  # check for valid data
+            speed = the_fix.TPV['speed']
+            latitude = the_fix.TPV['lat']
+            longitude = the_fix.TPV['lon']
+            altitude = the_fix.TPV['alt']
+            print('Latitude:', latitude, 'Longitude:', longitude)
+            sleep(1)
+except KeyboardInterrupt:
+    the_connection.close()
+    print("\nTerminated by user\nGood Bye.\n")
